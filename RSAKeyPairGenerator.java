@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.security.InvalidKeyException;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.KeyFactory;
+import java.util.Base64;
 
 //add the provider package
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -62,27 +63,26 @@ public class RSAKeyPairGenerator {
         //add at runtime the Bouncy Castle Provider
     	//the provider is available only for this application
     	Security.addProvider(new BouncyCastleProvider());
-        KeyPairGenerator keygtr = null;
+        KeyPairGenerator keyGtr = null;
         try {
-            keygtr = KeyPairGenerator.getInstance("RSA", Security.getProvider("BC"));
+            keyGtr = KeyPairGenerator.getInstance("RSA", Security.getProvider("BC"));
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(RSAKeyPairGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        keygtr.initialize(keyLength);
-        KeyPair rsaKeyPair = keygtr.genKeyPair();
+        keyGtr.initialize(keyLength);
+        KeyPair rsaKeyPair = keyGtr.genKeyPair();
         return rsaKeyPair;
     }
     
     public static void storeKey(Key key, String filePath) throws IOException {
-        System.out.println("storeKey: "+key.getAlgorithm());
-        System.out.println("storeKey: "+key.getFormat());
-        System.out.println("storeKey: "+key.getEncoded());
         String fileName;
         fileName = new String("keyfile.key");
         OutputStream fw;
         fw = new FileOutputStream(filePath + fileName);
-        fw.write(key.getEncoded());
+        byte[] encodedStr = null;
+        encodedStr = Base64.getMimeEncoder().encode(key.getEncoded());
+        fw.write(encodedStr);
         fw.flush();
         fw.close();
     }
@@ -92,7 +92,6 @@ public class RSAKeyPairGenerator {
         fi = new FileInputStream(filePath);
         byte[] inputKeyStream = new byte[1024];
         fi.read(inputKeyStream);
-        System.out.println(fi);
         Key key;
         key = new SecretKeySpec(inputKeyStream, "RSA");
         System.out.println(key.getAlgorithm());
