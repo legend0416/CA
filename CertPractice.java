@@ -19,8 +19,6 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bouncycastle.util.io.pem.PemObjectGenerator;
-import org.bouncycastle.util.io.pem.PemWriter;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.util.io.pem.PemObject;
 
@@ -33,7 +31,7 @@ public class CertPractice {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws FileNotFoundException, IOException {
+    public static void main(String[] args) {
         // TODO code application logic here
         CertPractice certPractice = new CertPractice();
         X509Certificate cert = null;
@@ -50,7 +48,7 @@ public class CertPractice {
         System.out.println(verNum);
     }
 
-    void storeCert(X509Certificate cert, String filePath) throws FileNotFoundException, IOException {
+    void storeCert(X509Certificate cert, String filePath) {
         /**
          * FileOutputStream fw = new FileOutputStream(filePath); byte[]
          * encodedStr = null; byte[] lineSeparator = {'\n'}; try { encodedStr =
@@ -63,25 +61,21 @@ public class CertPractice {
 
         try (JcaPEMWriter pw = new JcaPEMWriter(new FileWriter(filePath))) {
             pw.writeObject( new PemObject("CERTIFICATE", cert.getEncoded()));
-        } catch (CertificateEncodingException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    X509Certificate loadCert(String filePath) throws FileNotFoundException, IOException {
-
-        FileInputStream inStream = null;
+    X509Certificate loadCert(String filePath) {
+        
         X509Certificate cert = null;
-        inStream = new FileInputStream(filePath);
         CertificateFactory cf = null;
-        try {
+        try (FileInputStream is = new FileInputStream(filePath)){
             cf = CertificateFactory.getInstance("X.509");
-            cert = (X509Certificate) cf.generateCertificate(inStream);
-        } catch (CertificateException ex) {
-            Logger.getLogger(CertPractice.class.getName()).log(Level.SEVERE, null, ex);
+            cert = (X509Certificate) cf.generateCertificate(is);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        inStream.close();
-
         return cert;
     }
 
