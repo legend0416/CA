@@ -40,22 +40,13 @@ public class RSAKeyPairGenerator {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         // TODO code application logic here
         KeyPair rsaKey = RSAKeyPairGenerator.genKey(1024);
-        /**
-        if(rsaKey != null) {
-            System.out.println("haha");
-        }
-        else {
-            System.out.println("TT");
-        }        System.out.println(rsaKey.getPrivate());
-        **/
-        //System.out.println(rsaKey.getPublic());
-        RSAKeyPairGenerator.storeKey(rsaKey.getPrivate(), "C:\\Users\\tas208\\Documents\\Practice\\RSAKeyPairGenerator\\");
+        RSAKeyPairGenerator.storeKey(rsaKey.getPrivate(), "C:\\Users\\tas208\\Documents\\Practice\\RSAKeyPairGenerator\\keyFile.key");
         //adKey("C:\\Users\\tas208\\Documents\\Practice\\RSAKeyPairGenerator\\keyfile.key");
         
-        Key keyLoaded = loadKey("C:\\Users\\tas208\\Documents\\Practice\\RSAKeyPairGenerator\\keyfile.key");
+        Key keyLoaded = loadKey("C:\\Users\\tas208\\Documents\\Practice\\RSAKeyPairGenerator\\keyFile.key");
         
     }
         
@@ -64,39 +55,40 @@ public class RSAKeyPairGenerator {
     	//the provider is available only for this application
     	Security.addProvider(new BouncyCastleProvider());
         KeyPairGenerator keyGtr = null;
+        KeyPair rsaKeyPair = null;
         try {
             keyGtr = KeyPairGenerator.getInstance("RSA", Security.getProvider("BC"));
+            keyGtr.initialize(keyLength);
+            rsaKeyPair = keyGtr.genKeyPair();
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(RSAKeyPairGenerator.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
-        
-        keyGtr.initialize(keyLength);
-        KeyPair rsaKeyPair = keyGtr.genKeyPair();
         return rsaKeyPair;
     }
     
-    public static void storeKey(Key key, String filePath) throws IOException {
-        String fileName;
-        fileName = new String("keyfile.key");
-        OutputStream fw;
-        fw = new FileOutputStream(filePath + fileName);
-        byte[] encodedStr = null;
-        encodedStr = Base64.getMimeEncoder().encode(key.getEncoded());
-        fw.write(encodedStr);
-        fw.flush();
-        fw.close();
+    public static void storeKey(Key key, String filePath) {
+        
+        try(OutputStream fw = new FileOutputStream(filePath)) {
+            byte[] encodedStr = Base64.getMimeEncoder().encode(key.getEncoded());
+            fw.write(encodedStr);
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
     }
      
-    public static Key loadKey(String filePath) throws FileNotFoundException, IOException {
-        InputStream fi;
-        fi = new FileInputStream(filePath);
-        byte[] inputKeyStream = new byte[1024];
-        fi.read(inputKeyStream);
-        Key key;
-        key = new SecretKeySpec(inputKeyStream, "RSA");
-        System.out.println(key.getAlgorithm());
-        System.out.println(key.getFormat());
-        System.out.println(key.getEncoded());
+    public static Key loadKey(String filePath) {
+        
+        Key key = null;
+        try(FileInputStream fis = new FileInputStream(filePath) ) {
+            byte[] inputKeyStream = new byte[1024];
+            fis.read(inputKeyStream);
+            key = new SecretKeySpec(inputKeyStream, "RSA");
+            System.out.println(key.getAlgorithm());
+            System.out.println(key.getFormat());
+            System.out.println(key.getEncoded());
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
         return key;
         
     }
