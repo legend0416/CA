@@ -12,10 +12,10 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -25,7 +25,6 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequest;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
-
 /**
  *
  * @author TAS208
@@ -61,15 +60,23 @@ public class CSRPractice {
         }
     }
     PKCS10CertificationRequest loadCSR(String filePath) {
+        
+        PKCS10CertificationRequest csr = null;
         try(FileInputStream fis = new FileInputStream(filePath)) {
             byte[] is = new byte[1024];
             fis.read(is);
-            PKCS10CertificationRequest csr = new PKCS10CertificationRequest(is);
+            csr = new PKCS10CertificationRequest(is);
         } catch(Exception ex) {
             ex.printStackTrace();
         }
+        return csr;
     }
+    
     String getCN(PKCS10CertificationRequest csr) {
+        X500Name x500name = csr.getSubject();
+        RDN cn = x500name.getRDNs(BCStyle.CN)[0];
+        
+        return IETFUtils.valueToString(cn.getFirst().getValue());
     }
     PublicKey getPublicKey(PKCS10CertificationRequest csr) {
         JcaPKCS10CertificationRequest jcacsr = new JcaPKCS10CertificationRequest(csr);
