@@ -88,6 +88,19 @@ public class CRLPractice {
                 }
             }
             else if(oid.equals(issuerAlternativeName.getId()) ){
+                GeneralNames issuerAltName = null;
+                try {
+                    issuerAltName = GeneralNames.getInstance(jcaext.parseExtensionValue(crl.getExtensionValue(oid)) );
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                if(issuerAltName != null) {
+                    System.out.println("Get Issuer Alternative Name.");
+                    
+                }
+                else {
+                    System.out.println("noooooo");
+                }
             }
             else if (oid.equals(cRLNumber.getId()) ) {
                 CRLNumber crlNum = null;
