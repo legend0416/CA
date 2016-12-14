@@ -222,7 +222,19 @@ public class CertPractice {
             else if (oid.equals(instructionCode.getId())) {
             }**/
             else if (oid.equals(issuerAlternativeName.getId())) {
-                System.out.println("****Get Issuer Alternative Name.");
+                                GeneralNames issuerAltName = null;
+                try {
+                    issuerAltName = GeneralNames.getInstance(jcaext.parseExtensionValue(cert.getExtensionValue(oid)) );
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                if(issuerAltName != null) {
+                    System.out.println("Get Issuer Alternative Name.");
+                    
+                }
+                else {
+                    System.out.println("noooooo");
+                }
             }
             else if (oid.equals(keyUsage.getId())) {
                 KeyUsage keyUsage = null;
@@ -309,7 +321,19 @@ public class CertPractice {
             else if (oid.equals(qCStatements.getId() ) ) {
             }**/
             else if (oid.equals(subjectAlternativeName.getId() ) ) {
-                System.out.println("***Get Subject Alternative Name");
+                GeneralNames subAltName = null;
+                try {
+                    subAltName  = GeneralNames.getInstance(jcaext.parseExtensionValue(cert.getExtensionValue(oid)) );
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                if(subAltName  != null) {
+                    System.out.println("Get Issuer Alternative Name.");
+                    
+                }
+                else {
+                    System.out.println("noooooo");
+                }
             }
             else if (oid.equals( subjectDirectoryAttributes.getId() ) ) {
                 SubjectDirectoryAttributes subDirAttributes = null;
@@ -384,4 +408,5 @@ public class CertPractice {
         }
         return cert;
     }
+
 }
