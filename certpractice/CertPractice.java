@@ -45,11 +45,11 @@ public class CertPractice {
         // TODO code application logic here
         CertPractice certPractice = new CertPractice();
         X509Certificate cert = null;
-        cert = certPractice.loadCert("/Users/catherine/NetBeansProjects/CertPractice/res/full.crt");
-        //cert = certPractice.loadCert("C:\\Users\\tas208\\Documents\\Practice\\CertPractice\\src\\resources\\full.crt");
+        //cert = certPractice.loadCert("/Users/catherine/NetBeansProjects/CertPractice/res/full.crt");
+        cert = certPractice.loadCert("C:\\Users\\tas208\\Documents\\Practice\\CertPractice\\src\\resources\\full.crt");
         certPractice.parseCert(cert);
-        certPractice.storeCert(cert, "/Users/catherine/NetBeansProjects/CertPractice/res/certPractice.crt");
-        //certPractice.storeCert(cert, "C:\\Users\\tas208\\Documents\\Practice\\CertPractice\\certPractice.crt");
+        //certPractice.storeCert(cert, "/Users/catherine/NetBeansProjects/CertPractice/res/certPractice.crt");
+        certPractice.storeCert(cert, "C:\\Users\\tas208\\Documents\\Practice\\CertPractice\\certPractice.crt");
 
     }
     
@@ -104,11 +104,12 @@ public class CertPractice {
         Set<String> extSet = new HashSet<String>();
         extSet.addAll(cert.getCriticalExtensionOIDs());
         extSet.addAll(cert.getNonCriticalExtensionOIDs());
+        /**
         if(extSet.isEmpty()) {
             System.out.println("Is empty!!! QAQ");
         } else {
             System.out.println(extSet.size());
-        }
+        }**/
         JcaX509ExtensionUtils jcaext = null;
         for(String oid : extSet) {
             if(oid.equals (authorityInfoAccess.getId() ) ) {
@@ -129,7 +130,7 @@ public class CertPractice {
                     GeneralNames authorityCertIssuer = authKeyIdentifier.getAuthorityCertIssuer();
                     if(authorityCertIssuer != null) {
                         //Utils.parseGeneralNames(authorityCertIssuer);
-                        authorityCertIssuer.toString();
+                        System.out.println(authorityCertIssuer.toString());
                     }
                     BigInteger authCertSerialNum = authKeyIdentifier.getAuthorityCertSerialNumber();
                     if(authCertSerialNum != null) {
@@ -167,16 +168,16 @@ public class CertPractice {
                     System.out.println("Certificate Policies:");
                     PolicyInformation[] polyInfos = certPlc.getPolicyInformation();
                     for (PolicyInformation polyInfo: polyInfos) {
-                        System.out.println("Policy ID: " + polyInfo.getPolicyIdentifier().getId() + ":" );
+                        System.out.println("    Policy Identifier = " + polyInfo.getPolicyIdentifier().getId() + ":" );
                         ASN1Encodable[] policyQualifiers = polyInfo.getPolicyQualifiers().toArray();
                         for(ASN1Encodable policyQualifier: policyQualifiers) {
                             PolicyQualifierInfo policyQInfo = PolicyQualifierInfo.getInstance(policyQualifier.toASN1Primitive() );
                             if(policyQInfo.getPolicyQualifierId().getId().equals(PolicyQualifierId.id_qt_cps.getId()) ) {
-                                System.out.println("    Certification Practice Statement(" + PolicyQualifierId.id_qt_cps.getId() + ")");
+                                System.out.println("        Certification Practice Statement(" + PolicyQualifierId.id_qt_cps.getId() + ")");
                                 DERIA5String cPSuri = DERIA5String.getInstance(policyQInfo.getQualifier().toASN1Primitive());
-                                System.out.println("        " + cPSuri);
+                                System.out.println("            " + cPSuri);
                             } else {
-                                System.out.println("    User Notice(" + PolicyQualifierId.id_qt_unotice.getId() + ")");
+                                System.out.println("        User Notice(" + PolicyQualifierId.id_qt_unotice.getId() + ")");
                                 UserNotice usrNotice = UserNotice.getInstance(policyQInfo.getQualifier().toASN1Primitive());
                                 NoticeReference noticeRef = usrNotice.getNoticeRef();
                                 if(noticeRef != null) {
@@ -184,12 +185,12 @@ public class CertPractice {
                                     System.out.println(organization.getString());
                                     ASN1Integer[] noticeNumbers = noticeRef.getNoticeNumbers();
                                     for(ASN1Integer noticeNum: noticeNumbers ) {
-                                        System.out.println("        " + noticeNum.getValue().toString());
+                                        System.out.println("            " + noticeNum.getValue().toString());
                                     }
                                 }
                                 DisplayText explicitText = usrNotice.getExplicitText();
                                 if(explicitText != null) {
-                                    System.out.println("        " + explicitText.getString());
+                                    System.out.println("            " + explicitText.getString());
                                 }
                             }
                         }
@@ -297,8 +298,7 @@ public class CertPractice {
                 if(value != null) {
                     BigInteger ihbAnyPoly = value.getValue();
                     System.out.println("Inhibit AnyPolicy: " + ihbAnyPoly.toString());
-                }
-                else {
+                } else {
                     System.out.println("noooooo");
                 }
             }
@@ -311,8 +311,7 @@ public class CertPractice {
                 }
                 if(issuerAltName != null) {
                     System.out.println("Issuer Alternative Name: " + issuerAltName.toString());
-                }
-                else {
+                } else {
                     System.out.println("noooooo");
                 }
             }
@@ -370,17 +369,19 @@ public class CertPractice {
                     GeneralSubtree[] permittedSubtrees = nameCst.getPermittedSubtrees();
                     if(permittedSubtrees != null) {
                         for(GeneralSubtree permittedSubtree : permittedSubtrees) {
-                            System.out.println("    base: " + permittedSubtree.getBase().toString());
-                            System.out.println("    minimum : " + permittedSubtree.getMinimum());
-                            System.out.println("    maximum : " + permittedSubtree.getMaximum());
+                            System.out.println("    Permitted");
+                            System.out.println("        Base: " + permittedSubtree.getBase().toString());
+                            System.out.println("        Base Distance minimum : " + permittedSubtree.getMinimum());
+                            System.out.println("        Base Distance maximum : " + permittedSubtree.getMaximum());
                         }
                     }
                     GeneralSubtree[] excludedSubtrees = nameCst.getExcludedSubtrees();
                     if(excludedSubtrees != null) {
                         for(GeneralSubtree excludedSubtree : excludedSubtrees) {
-                            System.out.println("    base: " + excludedSubtree.getBase().toString());
-                            System.out.println("    minimum : " + excludedSubtree.getMinimum());
-                            System.out.println("    maximum : " + excludedSubtree.getMaximum());
+                            System.out.println("    Excluded");
+                            System.out.println("        base: " + excludedSubtree.getBase().toString());
+                            System.out.println("        minimum : " + excludedSubtree.getMinimum());
+                            System.out.println("        maximum : " + excludedSubtree.getMaximum());
                         }
                     }
                     if(permittedSubtrees == null && excludedSubtrees == null) {
@@ -463,7 +464,7 @@ public class CertPractice {
                 }
         
                 if(subDirAttributes != null) {
-                    System.out.println("Get Certificate Policies.");
+                    System.out.println("Subject Directory Attributes");
                 } else {
                     System.out.println("noooooo");
                 }
@@ -524,5 +525,4 @@ public class CertPractice {
         }
         return cert;
     }
-
 }
